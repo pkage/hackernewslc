@@ -1,4 +1,4 @@
-const inject = () => {
+const addLCs = () => {
 
 	const createPost = (title, subtext) => ({title, subtext})
 
@@ -12,42 +12,72 @@ const inject = () => {
 		}
 	}
 
+    const getCommentsLink = subtext => {
+        for (let link of subtext) {
+            if (/(comment|discuss)/.test(link.textContent)) {
+                return link
+            }
+        }
+        return null
+    }
+
 	// create the link + comments button
 	const addLCButton = (post) => {
 		let link, comments
 		try {
-			link = post.title.querySelector('.storylink').getAttribute('href')
 			// get the last subtext link
-			comments = post.subtext.querySelectorAll('a')[3].getAttribute('href')
+            comments = getCommentsLink(post.subtext.querySelectorAll('a')).href
+            
 		} catch (e) {
-			//console.warn('failed to inject onto ', post, e)
+			console.warn('failed to inject onto ', post, e)
 			return
-		}
-
-		const openLC = e => {
-			e.preventDefault()
-
-			if (comments != link) {
-				window.open(comments)
-			}
-			window.open(link)
 		}
 
 		const lcButton = document.createElement('a')
 		lcButton.innerText = 'l+c'
-		lcButton.setAttribute('href', '#')
+		lcButton.setAttribute('target', '_blank')
 
-		// explicit binding? what happened to closures?
-		lcButton.addEventListener('click', openLC)
+        link = post.title.querySelector('.storylink').href
+
+        // avoid opening self links twice
+        if (new URL(link).hostname !== 'news.ycombinator.com') {
+            lcButton.setAttribute('href', comments + '#openlc') 
+        } else {
+            lcButton.setAttribute('href', comments)
+        }
+
+        const opener = e => {
+            // enforces opening in background
+            e.preventDefault()
+            window.open(lcButton.href)
+            window.focus()
+        }
+
+        lcButton.addEventListener('click', opener)
 
 		// inject
 		const subtextTarget = post.subtext.querySelector('.subtext')
 		subtextTarget.appendChild(document.createTextNode(' | '))
 		subtextTarget.appendChild(lcButton)
+
 	}
 	
 	// map the function onto each post
 	posts.map(addLCButton)
+}
+
+const inject = () => {
+    const url = new URL(window.location.href)
+    if (url.hash === '#openlc') {
+        // this is gross, but basically open the window, focus the parent back,
+        // and then modify the page url so it doesn't trigger twice
+        window.open(document.querySelector('a.storylink').href)
+        window.opener.focus()
+        url.hash = ''
+        window.history.replaceState(null, '', url.href)
+    } else if (url.pathname !== '/item') {
+        addLCs()
+    }
 }
 
 inject()

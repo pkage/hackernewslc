@@ -4,7 +4,7 @@
 	"name": "Hacker News Link + Comments",
 	"author": "Patrick Kage",
 	"description": "Add a button to open both the link and the comments section in separate tabs on Hacker News",
-	"version": "1.0",
+	"version": "2.0",
 	"icons": {
 		"128": "icon.png"
 	},
