@@ -37,7 +37,7 @@ const addLCs = () => {
 		lcButton.innerText = 'l+c'
 		lcButton.setAttribute('target', '_blank')
 
-        link = post.title.querySelector('.storylink').href
+        link = post.title.querySelector('.titlelink').href
 
         // avoid opening self links twice
         if (new URL(link).hostname !== 'news.ycombinator.com') {
@@ -71,7 +71,7 @@ const inject = () => {
     if (url.hash === '#openlc') {
         // this is gross, but basically open the window, focus the parent back,
         // and then modify the page url so it doesn't trigger twice
-        window.open(document.querySelector('a.storylink').href)
+        window.open(document.querySelector('a.titlelink').href)
         window.opener.focus()
         url.hash = ''
         window.history.replaceState(null, '', url.href)
