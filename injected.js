@@ -37,7 +37,7 @@ const addLCs = () => {
 		lcButton.innerText = 'l+c'
 		lcButton.setAttribute('target', '_blank')
 
-        link = post.title.querySelector('.storylink').href
+        link = post.title.querySelector('.titleline > a').href
 
         // avoid opening self links twice
         if (new URL(link).hostname !== 'news.ycombinator.com') {
